@@ -11,7 +11,7 @@ const ReferralsPage = dynamic(
 );
 
 export const metadata = {
-  title: "Referrals - ReeseBlanks",
+  title: "Referrals - ReeseBlank",
   description: "Refer friends and earn rewards",
 };
 

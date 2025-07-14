@@ -1,5 +1,5 @@
 /*
-  # Seed Demo Data for ReeseBlanks Platform
+  # Seed Demo Data for ReeseBlank Platform
 
   1. Categories
     - Create product categories for organization

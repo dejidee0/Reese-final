@@ -147,7 +147,7 @@ BEGIN
     ) VALUES (
       gen_random_uuid(),
       gen_random_uuid(), -- This will need to be updated when actual user signs up
-      'admin@reeseblanks.com',
+      'admin@ReeseBlank.com',
       'Admin',
       'User',
       'vip',
@@ -157,6 +157,6 @@ BEGIN
       now()
     );
     
-    RAISE NOTICE 'Default admin profile created with email: admin@reeseblanks.com';
+    RAISE NOTICE 'Default admin profile created with email: admin@ReeseBlank.com';
   END IF;
 END $$;

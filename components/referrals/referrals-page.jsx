@@ -76,7 +76,7 @@ export function ReferralsPage() {
 
     const referralLink = `${window.location.origin}/register?ref=${referralCode}`;
     const shareData = {
-      title: "Join ReeseBlanks",
+      title: "Join ReeseBlank",
       text: "Check out this amazing streetwear brand! Use my referral code for exclusive benefits.",
       url: referralLink,
     };
@@ -120,7 +120,7 @@ export function ReferralsPage() {
         >
           <h1 className="text-4xl font-bold mb-4">Refer & Earn</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Share ReeseBlanks with your friends and earn rewards for every
+            Share ReeseBlank with your friends and earn rewards for every
             successful referral.
           </p>
         </motion.div>

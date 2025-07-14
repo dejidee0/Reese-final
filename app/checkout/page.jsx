@@ -1,7 +1,7 @@
 import { CheckoutForm } from "../../components/checkout/checkout-form";
 
 export const metadata = {
-  title: "Checkout - ReeseBlanks",
+  title: "Checkout - ReeseBlank",
   description: "Complete your purchase",
 };
 

@@ -105,7 +105,7 @@ export function AdminLoginInfo() {
             </h1>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Here are the admin credentials for accessing the ReeseBlanks admin
+            Here are the admin credentials for accessing the ReeseBlank admin
             dashboard. Keep these credentials secure and change the default
             password after first login.
           </p>

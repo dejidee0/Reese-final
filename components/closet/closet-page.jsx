@@ -608,7 +608,7 @@
 //               <div>
 //                 <h2 className="text-2xl font-bold">Community Favorites</h2>
 //                 <p className="text-gray-600">
-//                   Discover amazing outfits from the ReeseBlanks community
+//                   Discover amazing outfits from the ReeseBlank community
 //                 </p>
 //               </div>
 //               <Button

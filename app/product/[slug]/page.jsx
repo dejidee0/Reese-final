@@ -1,10 +1,10 @@
-import { ProductDetails } from '@/components/product/product-details'
-import { RelatedProducts } from '@/components/product/related-products'
+import { ProductDetails } from "@/components/product/product-details";
+import { RelatedProducts } from "@/components/product/related-products";
 
 export const metadata = {
-  title: 'Product Details - ReeseBlanks',
-  description: 'Premium streetwear product details'
-}
+  title: "Product Details - ReeseBlank",
+  description: "Premium streetwear product details",
+};
 
 export default function ProductPage({ params }) {
   return (
@@ -12,5 +12,5 @@ export default function ProductPage({ params }) {
       <ProductDetails slug={params.slug} />
       <RelatedProducts />
     </div>
-  )
+  );
 }

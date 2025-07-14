@@ -1,4 +1,4 @@
--- Create tables for ReeseBlanks platform
+-- Create tables for ReeseBlank platform
 
 -- Users and profiles
 CREATE TABLE IF NOT EXISTS profiles (

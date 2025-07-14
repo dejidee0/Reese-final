@@ -64,11 +64,6 @@ export function ProductCard({ product, viewMode = "grid" }) {
           {product.is_featured && (
             <Badge className="bg-purple-500 text-white">Featured</Badge>
           )}
-          {product.discount_percentage > 0 && (
-            <Badge className="bg-red-500 text-white">
-              -{product.discount_percentage}%
-            </Badge>
-          )}
 
           {/* Hover Actions */}
           <motion.div
@@ -126,21 +121,13 @@ export function ProductCard({ product, viewMode = "grid" }) {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {product.original_price &&
-                product.original_price > product.price && (
-                  <span className="text-sm text-gray-400 line-through">
-                    ₦{product.original_price.toLocaleString()}
-                  </span>
-                )}
-
-              {product.rating && (
-                <div className="flex items-center gap-1">
-                  <span className="text-yellow-400">★</span>
-                  <span className="text-sm text-gray-600">
-                    {product.rating}
-                  </span>
-                </div>
-              )}
+              <span className="text-xl font-bold text-black">
+                ₦
+                {Math.max(
+                  product.price,
+                  product.original_price || 0
+                ).toLocaleString()}
+              </span>
             </div>
 
             {product.stock_quantity <= 10 && product.stock_quantity > 0 && (

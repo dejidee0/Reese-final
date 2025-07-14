@@ -138,7 +138,7 @@ export default function AdminSetupPage() {
             <Crown className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
             <h1 className="text-4xl font-bold mb-4">Admin Setup</h1>
             <p className="text-gray-600">
-              Set up your admin account to manage the ReeseBlanks platform
+              Set up your admin account to manage the ReeseBlank platform
             </p>
           </div>
 
@@ -203,7 +203,7 @@ export default function AdminSetupPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-green-700 mb-4">
-                  You have admin access to the ReeseBlanks platform!
+                  You have admin access to the ReeseBlank platform!
                 </p>
                 <div className="flex gap-2">
                   <Button

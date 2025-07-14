@@ -34,7 +34,7 @@ export function Header() {
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent"
             >
-              ReeseBlanks
+              ReeseBlank
             </motion.div>
           </Link>
 

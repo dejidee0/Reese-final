@@ -1,9 +1,9 @@
-import { RegisterForm } from '@/components/auth/register-form'
+import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata = {
-  title: 'Register - ReeseBlanks',
-  description: 'Create your ReeseBlanks account'
-}
+  title: "Register - ReeseBlank",
+  description: "Create your ReeseBlank account",
+};
 
 export default function RegisterPage() {
   return (
@@ -11,12 +11,14 @@ export default function RegisterPage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">
-            Join ReeseBlanks
+            Join ReeseBlank
           </h1>
-          <p className="text-gray-600 mt-2">Create your account and start your style journey</p>
+          <p className="text-gray-600 mt-2">
+            Create your account and start your style journey
+          </p>
         </div>
         <RegisterForm />
       </div>
     </div>
-  )
+  );
 }

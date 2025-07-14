@@ -1,39 +1,39 @@
-import { motion } from 'framer-motion'
-import { Instagram, Twitter, Youtube, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import Link from 'next/link'
+import { motion } from "framer-motion";
+import { Instagram, Twitter, Youtube, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 export function Footer() {
   const footerSections = [
     {
-      title: 'Shop',
+      title: "Shop",
       links: [
-        { name: 'New Arrivals', href: '/new' },
-        { name: 'Best Sellers', href: '/bestsellers' },
-        { name: 'Sale', href: '/sale' },
-        { name: 'Gift Cards', href: '/gift-cards' },
-      ]
+        { name: "New Arrivals", href: "/new" },
+        { name: "Best Sellers", href: "/bestsellers" },
+        { name: "Sale", href: "/sale" },
+        { name: "Gift Cards", href: "/gift-cards" },
+      ],
     },
     {
-      title: 'Community',
+      title: "Community",
       links: [
-        { name: 'Style Arena', href: '/arena' },
-        { name: 'Your Closet', href: '/closet' },
-        { name: 'VIP Access', href: '/vip-access' },
-        { name: 'Referrals', href: '/referrals' },
-      ]
+        { name: "Style Arena", href: "/arena" },
+        { name: "Your Closet", href: "/closet" },
+        { name: "VIP Access", href: "/vip-access" },
+        { name: "Referrals", href: "/referrals" },
+      ],
     },
     {
-      title: 'Support',
+      title: "Support",
       links: [
-        { name: 'Size Guide', href: '/size-guide' },
-        { name: 'Shipping', href: '/shipping' },
-        { name: 'Returns', href: '/returns' },
-        { name: 'Contact', href: '/contact' },
-      ]
-    }
-  ]
+        { name: "Size Guide", href: "/size-guide" },
+        { name: "Shipping", href: "/shipping" },
+        { name: "Returns", href: "/returns" },
+        { name: "Contact", href: "/contact" },
+      ],
+    },
+  ];
 
   return (
     <footer className="bg-black text-white">
@@ -65,22 +65,46 @@ export function Footer() {
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-orange-400 bg-clip-text text-transparent mb-4"
             >
-              ReeseBlanks
+              ReeseBlank
             </motion.div>
             <p className="text-gray-400 text-sm mb-4">
-              The luxe vanguard of streetwear culture. Defining tomorrow's style today.
+              The luxe vanguard of streetwear culture. Defining tomorrow's style
+              today.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                <Instagram className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                <Twitter className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Link
+                href="https://www.instagram.com/reeseblank23"
+                target="_blank"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Instagram className="w-5 h-5" />
+                </Button>
+              </Link>
+              <Link href="https://x.com/reeseblazk" target="_blank">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Twitter className="w-5 h-5" />
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
                 <Youtube className="w-5 h-5" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
                 <Mail className="w-5 h-5" />
               </Button>
             </div>
@@ -109,15 +133,40 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-            <p>© 2024 ReeseBlanks. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-white">Terms of Service</Link>
-              <Link href="/cookies" className="hover:text-white">Cookie Policy</Link>
+            <p>© {new Date().getFullYear()} ReeseBlank. All rights reserved.</p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-4 md:mt-0 text-sm">
+              <Link href="/privacy" className="hover:text-white">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-white">
+                Terms of Service
+              </Link>
+              <Link href="/cookies" className="hover:text-white">
+                Cookie Policy
+              </Link>
+              <span className="hidden md:inline-block">|</span>
+              <span className="text-gray-500">
+                Built by{" "}
+                <Link
+                  href="https://www.codewithmonk.com"
+                  target="_blank"
+                  className="hover:text-white font-semibold underline underline-offset-2"
+                >
+                  Codewithmonk
+                </Link>{" "}
+                <Link
+                  href="https://www.instagram.com/techbro.mike"
+                  target="_blank"
+                  className="ml-1 text-gray-400 hover:text-purple-400"
+                >
+                  (@techbro.mike)
+                </Link>
+              </span>
             </div>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
