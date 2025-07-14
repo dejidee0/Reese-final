@@ -171,7 +171,7 @@ export function LookbookPage() {
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
             transition={{ duration: 10, ease: "easeOut" }}
-            src="https://images.pexels.com/photos/1661471/pexels-photo-1661471.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080"
+            src="/hero2.jpg"
             alt="Lookbook Hero"
             className="w-full h-full object-cover"
           />
