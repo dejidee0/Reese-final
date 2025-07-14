@@ -19,30 +19,33 @@ export function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log("🔄 Starting login...");
 
     try {
-      const { error } = await signInAndInsertProfile(email, password);
-      console.log("✅ Login function returned");
+      const firstName = localStorage.getItem("pendingFirstName");
+      const lastName = localStorage.getItem("pendingLastName");
+
+      const { error } = await signInAndInsertProfile(email, password, {
+        firstName,
+        lastName,
+      });
 
       if (error) {
-        console.warn("⚠️ Login error:", error);
         if (error.code === "email_not_confirmed") {
-          toast.error(
-            "Please check your inbox and verify your email to continue."
-          );
+          toast.error("Please check your inbox and verify your email.");
         } else {
           toast.error(error.message);
         }
       } else {
+        // Clean up localStorage after successful insert
+        localStorage.removeItem("pendingFirstName");
+        localStorage.removeItem("pendingLastName");
+
         toast.success("Welcome back!");
         router.push("/dashboard");
       }
-    } catch (error) {
-      console.error("❌ Unexpected error:", error);
-      toast.error("Something went wrong. Please try again.");
+    } catch (err) {
+      toast.error("Something went wrong.");
     } finally {
-      console.log("🔚 Ending login process");
       setLoading(false);
     }
   };

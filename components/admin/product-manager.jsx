@@ -568,10 +568,11 @@ export function ProductManager() {
       <div className="grid gap-4">
         {products.map((product) => (
           <div key={product.id} className="border rounded-lg p-4">
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              {/* Left: Image + Info */}
               <div className="flex gap-4">
                 {/* Product Image */}
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                   {product.image_url ? (
                     <Image
                       src={product.image_url}
@@ -587,32 +588,26 @@ export function ProductManager() {
                 </div>
 
                 {/* Product Info */}
-                <div>
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
+                <div className="flex flex-col gap-1 text-sm">
+                  <h3 className="font-semibold text-base">{product.name}</h3>
                   {product.categories && (
-                    <p className="text-sm text-gray-500">
-                      {product.categories.name}
-                    </p>
+                    <p className="text-gray-500">{product.categories.name}</p>
                   )}
-                  <p className="text-gray-600 text-sm">{product.description}</p>
+                  <p className="text-gray-600">{product.description}</p>
                   <p className="text-xl font-bold mt-2">
                     ₦{product.price.toLocaleString()}
                   </p>
-                  <div className="flex items-center gap-4 mt-1">
-                    <p className="text-sm text-gray-500">
-                      Stock: {product.stock_quantity}
-                    </p>
-                    {product.images && product.images.length > 0 && (
-                      <p className="text-sm text-gray-500">
-                        +{product.images.length} more images
-                      </p>
+                  <div className="flex flex-wrap gap-4 mt-1 text-gray-500">
+                    <p>Stock: {product.stock_quantity}</p>
+                    {product.images?.length > 0 && (
+                      <p>+{product.images.length} more images</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2">
+              {/* Right: Actions */}
+              <div className="flex gap-2 sm:flex-col sm:items-end justify-end">
                 <Button
                   variant="outline"
                   size="sm"

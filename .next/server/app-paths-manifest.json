@@ -1,6 +1,4 @@
 {
-  "/page": "app/page.js",
-  "/closet/page": "app/closet/page.js",
-  "/arena/page": "app/arena/page.js",
-  "/lookbook/page": "app/lookbook/page.js"
+  "/not-found": "app/not-found.js",
+  "/admin/page": "app/admin/page.js"
 }

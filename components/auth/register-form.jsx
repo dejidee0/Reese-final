@@ -49,8 +49,9 @@ export function RegisterForm() {
       } else {
         toast.success("Account created successfully.");
         toast.success("Check your mail, Verify your email to continue");
+        localStorage.setItem("pendingFirstName", formData.firstName);
+        localStorage.setItem("pendingLastName", formData.lastName);
         router.push("/login");
-        s;
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
