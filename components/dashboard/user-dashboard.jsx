@@ -94,22 +94,21 @@ export function UserDashboard() {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4 min-w-0">
-  <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-    <User className="w-8 h-8 text-white" />
-  </div>
-  <div className="min-w-0">
-    <h1 className="text-3xl font-bold truncate">
-      {profile?.first_name} {profile?.last_name}
-    </h1>
-    <p className="text-gray-600 break-words">
-      {user?.email}
-    </p>
-  </div>
-</div>
-<Button variant="outline" onClick={handleLogout} className="mt-2">
-  <LogOut className="w-4 h-4 mr-2" />
-  Logout
-</Button>
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-8 h-8 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-3xl font-bold truncate">
+                  {profile?.first_name} {profile?.last_name}
+                </h1>
+                <p className="text-gray-600 break-words">{user?.email}</p>
+              </div>
+            </div>
+            <Button variant="outline" onClick={handleLogout} className="mt-2">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader className="pb-3">
