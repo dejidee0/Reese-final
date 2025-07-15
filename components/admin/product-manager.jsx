@@ -152,22 +152,43 @@ export function ProductManager() {
       let imageUrl = formData.image_url;
       let additionalImages = formData.images || [];
 
-      // Generate slug if not provided
       const slug = formData.slug || generateSlug(formData.name);
 
-      // Upload main image if provided
+      // Upload main image
       if (mainImageFile) {
-        const { url } = await uploadProductImage(mainImageFile, slug, true);
-        imageUrl = url;
+        try {
+          const { url } = await uploadProductImage(mainImageFile, slug, true);
+          imageUrl = url;
+        } catch (error) {
+          if (error.message?.includes("already exists")) {
+            toast.warning(
+              "Main image already exists. Please upload a different image."
+            );
+            setUploading(false);
+            return;
+          }
+          throw error;
+        }
       }
 
-      // Upload additional images if provided
+      // Upload additional images
       if (additionalImageFiles.length > 0) {
-        const uploadResults = await uploadProductImages(
-          additionalImageFiles,
-          slug
-        );
-        additionalImages = uploadResults.map((result) => result.url);
+        try {
+          const uploadResults = await uploadProductImages(
+            additionalImageFiles,
+            slug
+          );
+          additionalImages = uploadResults.map((result) => result.url);
+        } catch (error) {
+          if (error.message?.includes("already exists")) {
+            toast.warning(
+              "One or more additional images already exist. Please rename them before uploading."
+            );
+            setUploading(false);
+            return;
+          }
+          throw error;
+        }
       }
 
       const productData = {
@@ -200,7 +221,7 @@ export function ProductManager() {
       fetchProducts();
     } catch (error) {
       console.error("Error saving product:", error);
-      toast.error("Error saving product");
+      toast.error("Failed to save product. Please try again.");
     } finally {
       setUploading(false);
     }

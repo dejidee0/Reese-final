@@ -1,40 +1,49 @@
 "use client";
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { supabase } from '@/lib/supabase'
-import { toast } from 'sonner'
-import Image from 'next/image'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import Image from "next/image";
 
 export function LookbookManager() {
-  const [looks, setLooks] = useState([])
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedProducts, setSelectedProducts] = useState([])
+  const [looks, setLooks] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [coverImageFile, setCoverImageFile] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    cover_image: '',
-    video_url: '',
-    category: '',
-    total_price: 0
-  })
+    title: "",
+    description: "",
+    cover_image: "",
+    category: "",
+    total_price: 0,
+  });
 
   useEffect(() => {
-    fetchLooks()
-    fetchProducts()
-  }, [])
+    fetchLooks();
+    fetchProducts();
+  }, []);
 
   const fetchLooks = async () => {
     try {
       const { data, error } = await supabase
-        .from('lookbook')
-        .select(`
+        .from("lookbook")
+        .select(
+          `
           *,
           lookbook_products (
             id,
@@ -46,138 +55,155 @@ export function LookbookManager() {
               image_url
             )
           )
-        `)
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      setLooks(data || [])
+        `
+        )
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setLooks(data || []);
     } catch (error) {
-      toast.error('Error fetching looks')
+      toast.error("Error fetching looks");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchProducts = async () => {
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('id, name, slug, price, image_url')
-        .eq('is_active', true)
-        .order('name')
-      
-      if (error) throw error
-      setProducts(data || [])
+        .from("products")
+        .select("id, name, slug, price, image_url")
+        .eq("is_active", true)
+        .order("name");
+
+      if (error) throw error;
+      setProducts(data || []);
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error("Error fetching products:", error);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
+    const { name, value } = e.target;
+    if (name === "cover_image") return; // we handle file differently
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleCoverImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCoverImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setCoverImagePreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleProductSelection = (product, isSelected) => {
     if (isSelected) {
-      setSelectedProducts(prev => [...prev, { ...product, size: 'M' }])
+      setSelectedProducts((prev) => [...prev, { ...product, size: "M" }]);
     } else {
-      setSelectedProducts(prev => prev.filter(p => p.id !== product.id))
+      setSelectedProducts((prev) => prev.filter((p) => p.id !== product.id));
     }
-  }
+  };
 
   const updateProductSize = (productId, size) => {
-    setSelectedProducts(prev => 
-      prev.map(p => p.id === productId ? { ...p, size } : p)
-    )
-  }
+    setSelectedProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, size } : p))
+    );
+  };
 
   const calculateTotalPrice = () => {
-    return selectedProducts.reduce((total, product) => total + product.price, 0)
-  }
+    return selectedProducts.reduce(
+      (total, product) => total + product.price,
+      0
+    );
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
+    if (!coverImageFile) {
+      toast.error("Please upload a cover image.");
+      return;
+    }
+
     if (selectedProducts.length === 0) {
-      toast.error('Please select at least one product')
-      return
+      toast.error("Please select at least one product.");
+      return;
     }
 
     try {
+      const uploadedUrl = await uploadLookbookCoverImage(
+        coverImageFile,
+        formData.title
+      );
+
       const lookData = {
         ...formData,
+        cover_image: uploadedUrl,
         total_price: calculateTotalPrice(),
-        is_active: true
-      }
+        is_active: true,
+      };
 
       const { data: look, error } = await supabase
-        .from('lookbook')
+        .from("lookbook")
         .insert([lookData])
         .select()
-        .single()
-      
-      if (error) throw error
-      
-      // Add selected products to the look
-      const lookProducts = selectedProducts.map(product => ({
+        .single();
+
+      if (error) throw error;
+
+      const lookProducts = selectedProducts.map((product) => ({
         lookbook_id: look.id,
         product_id: product.id,
-        size: product.size
-      }))
-      
+        size: product.size,
+      }));
+
       const { error: productsError } = await supabase
-        .from('lookbook_products')
-        .insert(lookProducts)
-      
-      if (productsError) throw productsError
-      
-      toast.success('Look created successfully')
-      setIsDialogOpen(false)
-      setSelectedProducts([])
+        .from("lookbook_products")
+        .insert(lookProducts);
+
+      if (productsError) throw productsError;
+
+      toast.success("Look created successfully");
+      setIsDialogOpen(false);
+      setSelectedProducts([]);
       setFormData({
-        title: '',
-        description: '',
-        cover_image: '',
-        video_url: '',
-        category: '',
-        total_price: 0
-      })
-      fetchLooks()
+        title: "",
+        description: "",
+        cover_image: "",
+
+        category: "",
+        total_price: 0,
+      });
+      setCoverImageFile(null);
+      setCoverImagePreview(null);
+      fetchLooks();
     } catch (error) {
-      toast.error('Error creating look')
+      toast.error(error.message || "Error creating look");
     }
-  }
+  };
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this look?')) {
+    if (confirm("Are you sure you want to delete this look?")) {
       try {
         // Delete look products first
-        await supabase
-          .from('lookbook_products')
-          .delete()
-          .eq('lookbook_id', id)
-        
+        await supabase.from("lookbook_products").delete().eq("lookbook_id", id);
+
         // Then delete the look
-        const { error } = await supabase
-          .from('lookbook')
-          .delete()
-          .eq('id', id)
-        
-        if (error) throw error
-        toast.success('Look deleted successfully')
-        fetchLooks()
+        const { error } = await supabase.from("lookbook").delete().eq("id", id);
+
+        if (error) throw error;
+        toast.success("Look deleted successfully");
+        fetchLooks();
       } catch (error) {
-        toast.error('Error deleting look')
+        toast.error("Error deleting look");
       }
     }
-  }
+  };
 
   if (loading) {
-    return <div>Loading looks...</div>
+    return <div>Loading looks...</div>;
   }
 
   return (
@@ -215,7 +241,7 @@ export function LookbookManager() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -226,38 +252,44 @@ export function LookbookManager() {
                   required
                 />
               </div>
-              
+
               <div>
-                <Label htmlFor="cover_image">Cover Image URL</Label>
-                <Input
+                <Label htmlFor="cover_image">Cover Image</Label>
+                <input
                   id="cover_image"
-                  name="cover_image"
-                  value={formData.cover_image}
-                  onChange={handleInputChange}
-                  required
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverImageChange}
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
                 />
+                {coverImagePreview && (
+                  <div className="mt-2 w-24 h-32 relative rounded overflow-hidden border">
+                    <Image
+                      src={coverImagePreview}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
               </div>
-              
-              <div>
-                <Label htmlFor="video_url">Video URL (Optional)</Label>
-                <Input
-                  id="video_url"
-                  name="video_url"
-                  value={formData.video_url}
-                  onChange={handleInputChange}
-                  placeholder="Optional video for this look"
-                />
-              </div>
-              
+
               <div>
                 <Label>Select Products for this Look</Label>
                 <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded p-2">
                   {products.map((product) => (
-                    <label key={product.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                    <label
+                      key={product.id}
+                      className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded"
+                    >
                       <input
                         type="checkbox"
-                        checked={selectedProducts.some(p => p.id === product.id)}
-                        onChange={(e) => handleProductSelection(product, e.target.checked)}
+                        checked={selectedProducts.some(
+                          (p) => p.id === product.id
+                        )}
+                        onChange={(e) =>
+                          handleProductSelection(product, e.target.checked)
+                        }
                       />
                       <img
                         src={product.image_url}
@@ -266,23 +298,30 @@ export function LookbookManager() {
                       />
                       <div className="flex-1">
                         <span className="text-sm">{product.name}</span>
-                        <p className="text-xs text-gray-500">₦{product.price.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500">
+                          ₦{product.price.toLocaleString()}
+                        </p>
                       </div>
                     </label>
                   ))}
                 </div>
               </div>
-              
+
               {selectedProducts.length > 0 && (
                 <div>
                   <Label>Selected Products & Sizes</Label>
                   <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-2">
                     {selectedProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div
+                        key={product.id}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                      >
                         <span className="text-sm">{product.name}</span>
                         <select
                           value={product.size}
-                          onChange={(e) => updateProductSize(product.id, e.target.value)}
+                          onChange={(e) =>
+                            updateProductSize(product.id, e.target.value)
+                          }
                           className="text-sm border rounded px-2 py-1"
                         >
                           <option value="XS">XS</option>
@@ -300,14 +339,14 @@ export function LookbookManager() {
                   </p>
                 </div>
               )}
-              
+
               <div className="flex gap-2">
                 <Button type="submit" className="flex-1">
                   Create Look
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsDialogOpen(false)}
                 >
                   Cancel
@@ -334,7 +373,9 @@ export function LookbookManager() {
                 <div>
                   <h3 className="font-semibold text-lg">{look.title}</h3>
                   {look.category && (
-                    <Badge variant="secondary" className="mb-2">{look.category}</Badge>
+                    <Badge variant="secondary" className="mb-2">
+                      {look.category}
+                    </Badge>
                   )}
                   <p className="text-gray-600 mb-2">{look.description}</p>
                   <p className="text-lg font-bold">
@@ -349,7 +390,11 @@ export function LookbookManager() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(look.id)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(look.id)}
+                >
                   Delete
                 </Button>
               </div>
@@ -358,5 +403,5 @@ export function LookbookManager() {
         ))}
       </div>
     </div>
-  )
+  );
 }
