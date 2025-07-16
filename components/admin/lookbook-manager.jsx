@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import Image from "next/image";
+import { uploadLookbookCoverImage } from "@/lib/storage";
 
 export function LookbookManager() {
   const [looks, setLooks] = useState([]);
