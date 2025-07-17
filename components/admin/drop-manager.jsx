@@ -1,38 +1,45 @@
 "use client";
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { supabase } from '@/lib/supabase'
-import { toast } from 'sonner'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export function DropManager() {
-  const [drops, setDrops] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [products, setProducts] = useState([])
-  const [selectedProducts, setSelectedProducts] = useState([])
+  const [drops, setDrops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    drop_date: '',
-    starting_price: '',
-    quantity: '',
-    image_url: ''
-  })
+    name: "",
+    description: "",
+    drop_date: "",
+    starting_price: "",
+    quantity: "",
+    image_url: "",
+  });
 
   useEffect(() => {
-    fetchDrops()
-    fetchProducts()
-  }, [])
+    fetchDrops();
+    fetchProducts();
+  }, []);
 
   const fetchDrops = async () => {
     try {
       const { data, error } = await supabase
-        .from('drops')
-        .select(`
+        .from("drops")
+        .select(
+          `
           *,
           drop_products (
             id,
@@ -45,127 +52,148 @@ export function DropManager() {
               image_url
             )
           )
-        `)
-        .order('drop_date', { ascending: false })
-      
-      if (error) throw error
-      setDrops(data || [])
+        `
+        )
+        .order("drop_date", { ascending: false });
+
+      if (error) throw error;
+      setDrops(data || []);
     } catch (error) {
-      toast.error('Error fetching drops')
+      toast.error("Error fetching drops");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchProducts = async () => {
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('id, name, slug, price, image_url')
-        .eq('is_active', true)
-        .order('name')
-      
-      if (error) throw error
-      setProducts(data || [])
+        .from("products")
+        .select("id, name, slug, price, image_url")
+        .eq("is_active", true)
+        .order("name");
+
+      if (error) throw error;
+      setProducts(data || []);
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error("Error fetching products:", error);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleProductSelection = (productId, isSelected) => {
     if (isSelected) {
-      setSelectedProducts(prev => [...prev, productId])
+      setSelectedProducts((prev) => [...prev, productId]);
     } else {
-      setSelectedProducts(prev => prev.filter(id => id !== productId))
+      setSelectedProducts((prev) => prev.filter((id) => id !== productId));
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
-      const dropData = {
-        ...formData,
-        starting_price: parseFloat(formData.starting_price),
-        quantity: parseInt(formData.quantity),
-        is_active: true
+      let imageUrl = "";
+
+      if (formData.image_file) {
+        const file = formData.image_file;
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `public/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("drops")
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from("drops")
+          .getPublicUrl(filePath);
+
+        imageUrl = publicUrlData.publicUrl;
       }
 
-      const { error } = await supabase
-        .from('drops')
+      const dropData = {
+        name: formData.name,
+        description: formData.description,
+        drop_date: formData.drop_date,
+        starting_price: parseFloat(formData.starting_price),
+        quantity: parseInt(formData.quantity),
+        image_url: imageUrl,
+        is_active: true,
+      };
+
+      const { data: drop, error } = await supabase
+        .from("drops")
         .insert([dropData])
         .select()
-        .single()
-      
-      if (error) throw error
-      
-      // Add selected products to the drop
+        .single();
+
+      if (error) throw error;
+
       if (selectedProducts.length > 0) {
-        const dropProducts = selectedProducts.map(productId => ({
+        const dropProducts = selectedProducts.map((productId) => ({
           drop_id: drop.id,
           product_id: productId,
           drop_price: parseFloat(formData.starting_price),
-          quantity: Math.floor(parseInt(formData.quantity) / selectedProducts.length)
-        }))
-        
+          quantity: Math.floor(
+            parseInt(formData.quantity) / selectedProducts.length
+          ),
+        }));
+
         const { error: dropProductsError } = await supabase
-          .from('drop_products')
-          .insert(dropProducts)
-        
-        if (dropProductsError) throw dropProductsError
+          .from("drop_products")
+          .insert(dropProducts);
+
+        if (dropProductsError) throw dropProductsError;
       }
-      
-      toast.success('Drop created successfully')
-      setIsDialogOpen(false)
-      setSelectedProducts([])
+
+      toast.success("Drop created successfully");
+      setIsDialogOpen(false);
+      setSelectedProducts([]);
       setFormData({
-        name: '',
-        description: '',
-        drop_date: '',
-        starting_price: '',
-        quantity: '',
-        image_url: ''
-      })
-      fetchDrops()
+        name: "",
+        description: "",
+        drop_date: "",
+        starting_price: "",
+        quantity: "",
+        image_file: null,
+      });
+      fetchDrops();
     } catch (error) {
-      toast.error('Error creating drop')
+      toast.error("Error creating drop");
+      console.error(error);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this drop?')) {
+    if (confirm("Are you sure you want to delete this drop?")) {
       try {
         // Delete drop products first
-        await supabase
-          .from('drop_products')
-          .delete()
-          .eq('drop_id', id)
-        
+        await supabase.from("drop_products").delete().eq("drop_id", id);
+
         // Then delete the drop
-        const { error } = await supabase
-          .from('drops')
-          .delete()
-          .eq('id', id)
-        
-        if (error) throw error
-        toast.success('Drop deleted successfully')
-        fetchDrops()
+        const { error } = await supabase.from("drops").delete().eq("id", id);
+
+        if (error) throw error;
+        toast.success("Drop deleted successfully");
+        fetchDrops();
       } catch (error) {
-        toast.error('Error deleting drop')
+        toast.error("Error deleting drop");
       }
     }
-  }
+  };
 
   if (loading) {
-    return <div>Loading drops...</div>
+    return <div>Loading drops...</div>;
   }
 
   return (
@@ -191,7 +219,7 @@ export function DropManager() {
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -202,7 +230,7 @@ export function DropManager() {
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="drop_date">Drop Date</Label>
                 <Input
@@ -214,7 +242,7 @@ export function DropManager() {
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="starting_price">Starting Price (₦)</Label>
@@ -239,27 +267,38 @@ export function DropManager() {
                   />
                 </div>
               </div>
-              
+
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image_file">Drop Image</Label>
                 <Input
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleInputChange}
+                  id="image_file"
+                  name="image_file"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      image_file: e.target.files[0],
+                    }))
+                  }
                   required
                 />
               </div>
-              
+
               <div>
                 <Label>Select Products for this Drop</Label>
                 <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded p-2">
                   {products.map((product) => (
-                    <label key={product.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                    <label
+                      key={product.id}
+                      className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedProducts.includes(product.id)}
-                        onChange={(e) => handleProductSelection(product.id, e.target.checked)}
+                        onChange={(e) =>
+                          handleProductSelection(product.id, e.target.checked)
+                        }
                       />
                       <img
                         src={product.image_url}
@@ -271,14 +310,14 @@ export function DropManager() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button type="submit" className="flex-1">
                   Create Drop
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsDialogOpen(false)}
                 >
                   Cancel
@@ -304,7 +343,9 @@ export function DropManager() {
                 </p>
                 {drop.drop_products && drop.drop_products.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-sm font-medium">Products in this drop:</p>
+                    <p className="text-sm font-medium">
+                      Products in this drop:
+                    </p>
                     <div className="flex gap-2 mt-1">
                       {drop.drop_products.slice(0, 3).map((dropProduct) => (
                         <img
@@ -325,7 +366,11 @@ export function DropManager() {
                 )}
               </div>
               <div className="flex gap-2">
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(drop.id)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(drop.id)}
+                >
                   Delete
                 </Button>
               </div>
@@ -334,5 +379,5 @@ export function DropManager() {
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -188,13 +188,10 @@ export function LookbookManager() {
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this look?")) {
       try {
-        // Delete look products first
-        await supabase.from("lookbook_products").delete().eq("lookbook_id", id);
-
-        // Then delete the look
         const { error } = await supabase.from("lookbook").delete().eq("id", id);
 
         if (error) throw error;
+
         toast.success("Look deleted successfully");
         fetchLooks();
       } catch (error) {
